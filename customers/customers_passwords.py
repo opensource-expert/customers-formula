@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/pythoargsn
 # -*- coding: utf-8 -*-
 # vim: set ft=python:
 #
@@ -35,10 +35,17 @@ from __future__ import absolute_import
 import subprocess
 import sys
 import yaml
+import random
 
 def random_pass():
-  str = subprocess.check_output(["pwqgen"]).rstrip()
-  return str
+    res = subprocess.check_output(["pwqgen"]).rstrip()
+    return res
+
+def unix_pass(password):
+    saltpw = str(random.randint(2**10, 2**32))
+    args = ['openssl', 'passwd', '-1', '-salt', saltpw, password]
+    res = subprocess.check_output(args).rstrip()
+    return res
 
 def main():
     user_db = sys.argv[1]
@@ -66,9 +73,30 @@ def main():
 
     n = 0
     for u in missing_password:
-        new_pass = {'mysql' : random_pass(), 'shell' : random_pass() }
+        shell_pass = random_pass()
+        new_pass = {'mysql' : random_pass(),
+                    'shell' : shell_pass,
+                    'hash': unix_pass(shell_pass) }
         passDB[u] = new_pass
         n += 1
+
+    # check for missing fields
+    # loop over missing fields if any and complete
+    fields = ['mysql', 'shell', 'hash']
+    for u, passwd in passDB.items():
+        for p in fields:
+            myp = passwd.get(p)
+            if myp == None or myp == '':
+                if p == 'hash':
+                    hashed = unix_pass(passDB[u]['shell'])
+                    passDB[u]['hash'] = hashed
+                elif p == 'shell':
+                    passDB[u]['hash'] = None
+                    passDB[u][p] = random_pass()
+                else:
+                    passDB[u][p] = random_pass()
+
+                n += 1
 
     # write back modified yaml
     if n > 0:
