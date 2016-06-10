@@ -40,11 +40,12 @@
 # generate password for customers
 {%  set password_db = target_dir + '/managed_password.yaml' -%}
 {%  set user_db = pillar_dir + '/customers.sls' -%}
+{%  set formuladir = '/srv/salt/formulas/customers-formula/customers' %}
 check_passwords:
   cmd.run:
     - name: ./customers_passwords.py {{ user_db }} {{ password_db }}
-    - cwd: /srv/salt/base/customers
-    - unless: test {{ password_db }} -nt {{ user_db }}
+    - cwd: {{ formuladir }}
+    - unless: test  {{ user_db }} -nt {{ password_db }}
 
 # just ensure restricted permissions
 generate_customers_passwords:
