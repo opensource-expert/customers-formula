@@ -2,7 +2,7 @@
 # unittest
 #
 import sys
-sys.path.append('..')
+sys.path.append('../customers')
 
 import os
 from customers_passwords import *
