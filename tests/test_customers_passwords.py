@@ -5,6 +5,7 @@ import sys
 sys.path.append('../customers')
 
 import os
+import copy
 from customers_passwords import *
 
 def _create_yaml(fname):
@@ -104,6 +105,18 @@ def test_update_missing_fields():
     assert n == 5
     assert passDB['user5']['hash'] != old_hash
 
+    # with an old unordered passwords
+    # ensure old value are still here
+    old_pass = read_yaml('old_pass.yaml')
+    copy_pass = copy.deepcopy(old_pass)
+
+    count = len(old_pass.keys())
+    assert count > 0
+    n = update_missing_fields(copy_pass)
+    assert n == count
+    for k in old_pass.keys():
+        assert old_pass[k]['shell'] == copy_pass[k]['shell']
+        assert old_pass[k]['mysql'] == copy_pass[k]['mysql']
 
 def test_main():
     user_db = '../pillar.example'
