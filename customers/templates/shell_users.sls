@@ -1,4 +1,5 @@
-# vim: set ft=jinja:
+{# vim: set ft=jinja: -#}
+# v{{ 'im' }}: set ft=yaml:
 #
 # DON'T EDIT THIS FILE: salt managed file
 #
@@ -9,11 +10,13 @@ users:
 {%- for name, client in salt['pillar.get']('wsf:customers', {}).items() %}
 {%-   if not client.get('deleted') and client['enabled'] and 'webhost' in client['services'] %}
   {{ name }}:
-    password: {{ '"{{' }} pass['{{ name }}']['shell'] {{ '}}"' }}
+    {#-                   use hashed password #}
+    password: {{ '"{{' }} pass['{{ name }}']['hash'] {{ '}}"' }}
     fullname: web user {{ name }}
-    enforce_password: True
+    # enforce_password: True
     empty_password: False
-    home: /home/{{ name }}
+    # chrooted: sftp goes to /home/{{ name }}/vhost web in www/
+    home: /home/{{ name }}/vhost
     createhome: False
     sudouser: False
     shell: /bin/bash
@@ -21,5 +24,8 @@ users:
       name: {{ name }}
     groups:
       - www-data
+      {%- if 'sftp' in client['services'] %}
+      - sftponly
+      {%- endif %}
 {%    endif -%}
 {% endfor -%}

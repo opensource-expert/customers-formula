@@ -38,14 +38,15 @@
     - template: jinja
 
 # generate password for customers
-{%  set password_db = target_dir + '/managed_password.yaml' -%}
-{%  set user_db = pillar_dir + '/customers.sls' -%}
-{%  set formuladir = '/srv/salt/formulas/customers-formula/customers' %}
+{% set password_db = target_dir + '/managed_password.yaml' -%}
+{% set user_db = pillar_dir + '/customers.sls' -%}
+{% set formuladir = '/srv/salt/formulas/customers-formula/customers' %}
+{% set password_gen = formuladir ~ '/customers_passwords.py' %}
 check_passwords:
   cmd.run:
-    - name: ./customers_passwords.py {{ user_db }} {{ password_db }}
+    - name: {{ password_gen }}  {{ user_db }} {{ password_db }}
     - cwd: {{ formuladir }}
-    - unless: test  {{ user_db }} -nt {{ password_db }}
+    - unless: test {{ password_db }} -nt {{ password_gen }} -a {{ password_db }} -nt {{ user_db }}
 
 # just ensure restricted permissions
 generate_customers_passwords:
