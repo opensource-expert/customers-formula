@@ -19,7 +19,7 @@ apache:
 {%-     set Bin_dir           = '/home/' ~ user ~ '/bin' %}
     {{ client.domain_name }}:
       CustomerName: {{ user }}
-      # template_file: salt://webserver/vhosts/minimal.tmpl
+      #template_file: salt://webserver/config/vhost.conf
       ServerName: {{ client.domain_name }}
       ServerAlias: www.{{ client.domain_name }}
       ServerAdmin: {{ webmaster }}
@@ -39,5 +39,19 @@ apache:
           Allow: from all
           Require: all granted
           AllowOverride: None
+
+      Formula_Append: |
+        <IfModule mod_fastcgi.c>
+            AddType application/x-httpd-fastphp .php
+            Action application/x-httpd-fastphp /php-{{ user }}-fcgi
+            Alias /php-{{ user }}-fcgi /usr/lib/cgi-bin/php-{{ user }}-fcgi
+            FastCgiExternalServer /usr/lib/cgi-bin/php-{{ user }}-fcgi -appConnTimeout 10 -idle-timeout 250 -socket /var/run/php-fpm/fpm-{{ user }}.sock -pass-header Authorization
+            ### Apache 2.4+ ###
+            <Directory /usr/lib/cgi-bin>
+                Require all granted
+            </Directory>
+            ###
+        </IfModule>
+
 {%    endif -%}
 {% endfor -%}
