@@ -5,19 +5,6 @@
 # generated files are in the pillar and must be reviewed by the admin
 # before applying any other state
 #
-# Usage:
-# (on the saltmaster)
-#   salt-call state.apply customers
-#   cd target_dir
-#   git diff # double check
-#   salt '*' saltutil.refresh_pillar # propagate changes
-#
-# after…
-#   salt 'db*' config.get mysql:user # tripple check from a db server
-#   salt 'db*' state.apply mysql.user # update users
-# commit changes:
-#   cd target_dir
-#   git commit -a
 
 # target folder for generated pillar
 {% set pillar_dir = '/srv/salt/pillar' -%}
