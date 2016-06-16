@@ -33,7 +33,7 @@ apache:
       DocumentRoot: {{ DocumentRoot_dir }}
 
       Directory:
-        default:
+        {{ DocumentRoot_dir }}:
           Options: -Indexes +FollowSymLinks
           Order: allow,deny
           Allow: from all

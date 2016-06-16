@@ -7,7 +7,7 @@
 mysql:
   # Managed mariaDB users for customers
   user:
-{% set db_server = 'localhost' -%}
+{% set db_server = salt['pillar.get']('wsf:global:dbserver', 'localhost') -%}
 {%- for name, client in salt['pillar.get']('wsf:customers', {}).items() %}
 {%-   if not client.get('deleted') and client['enabled'] and 'db' in client['services'] %}
     {{ name }}:
