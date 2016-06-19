@@ -224,3 +224,7 @@ make-world:
     - tgt: '*'
     - highstate: True
 ~~~
+
+## TODO
+
+manage password with https://clinta.github.io/random-local-passwords/ passwordstore
