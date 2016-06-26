@@ -31,9 +31,11 @@
 {% set password_gen = formuladir ~ '/customers_passwords.py' %}
 check_passwords:
   cmd.run:
-    - name: {{ password_gen }}  {{ user_db }} {{ password_db }}
+    - name: {{ password_gen }} {{ user_db }} {{ password_db }} && touch {{ password_db }}
     - cwd: {{ formuladir }}
-    - unless: test {{ password_db }} -nt {{ password_gen }} -a {{ password_db }} -nt {{ user_db }}
+    # run only if: the script is newer or customers.sls is newer, but may not generate any new password
+    - onlyif: test {{ password_gen }} -nt {{ password_db }} -o {{ user_db }} -nt {{ password_db }}
+
 
 # just ensure restricted permissions
 generate_customers_passwords:

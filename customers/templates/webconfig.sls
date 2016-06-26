@@ -7,7 +7,10 @@
 apache:
   sites:
 {%- for user, client in salt['pillar.get']('wsf:customers', {}).items() %}
-{%-   if not client.get('deleted') and client['enabled'] and 'webhost' in client['services'] -%}
+{%-   if 'webhost' in client['services'] %}
+        {%- set customer_deleted = client.get('deleted') or client.get('delete') %}
+        {%- set customer_was_present = salt['pillar.get']('apache:sites:%s'|format(client.domain_name)) %}
+{%-     if not customer_deleted %}
 {#-     webmaster is computed globally but can be set by customer also #}
 {%-     set webmaster         = salt['pillar.get']('wsf:global:webmaster', 'nowebmaster@localhost') %}
 {%-     set webmaster         = client.get('webmaster', webmaster) %}
@@ -17,8 +20,13 @@ apache:
 {%-     set Log_dir           = '/home/' ~ user ~ '/logs' %}
 {%-     set Cron_dir          = '/home/' ~ user ~ '/cron' %}
 {%-     set Bin_dir           = '/home/' ~ user ~ '/bin' %}
+{%-       if client['enabled'] or customer_was_present %}
     {{ client.domain_name }}:
+{%-        if not client['enabled'] %}
+      enabled: False
+{%         endif %}
       CustomerName: {{ user }}
+
       #template_file: salt://webserver/config/vhost.conf
       ServerName: {{ client.domain_name }}
       ServerAlias: www.{{ client.domain_name }}
@@ -53,5 +61,7 @@ apache:
             ###
         </IfModule>
 
+{%        endif -%}
+{%      endif -%}
 {%    endif -%}
 {% endfor -%}

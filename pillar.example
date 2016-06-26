@@ -10,6 +10,8 @@ wsf:
   global:
     webmaster: someone@webmaster.com
     dbserver: database.domain.com
+    # used to compute database permission from the webserver
+    webserver: web.domain.com
   customers:
     # list elements will be used for naming users (shell, db)
     client1:
