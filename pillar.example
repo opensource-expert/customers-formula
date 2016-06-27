@@ -8,6 +8,7 @@
 #
 wsf:
   global:
+    # for web server ServerAdmin
     webmaster: someone@webmaster.com
     dbserver: database.domain.com
     # used to compute database permission from the webserver
@@ -16,6 +17,7 @@ wsf:
     # list elements will be used for naming users (shell, db)
     client1:
       domain_name: client1-domain.fr
+      # can override webmaster here
       webmaster: client1@webmaster.com
       enabled: true
       delete: false
