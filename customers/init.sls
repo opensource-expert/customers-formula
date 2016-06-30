@@ -8,7 +8,24 @@
 
 # target folder for generated pillar
 {% set pillar_dir = '/srv/salt/pillar' -%}
-{% set target_dir = pillar_dir + '/auto' -%}
+{% set customers_top = salt['pillar.get']('customers_top') %}
+
+{% if not customers_top %}
+Fail - no customers_top:
+  test.fail_without_changes:
+    # https://docs.saltstack.com/en/latest/ref/states/failhard.html
+    - failhard: True
+{% endif %}
+
+{% if not salt['pillar.get']('%s:customers'|format(customers_top)) %}
+Fail - no customers found:
+  test.fail_without_changes:
+    - failhard: True
+{% endif %}
+
+{% set customers_dir = salt['pillar.get']('%s:global:customers_dir'|format(customers_top), '.') -%}
+{# # replace with destination dir -#}
+{% set target_dir = (pillar_dir + '/' + customers_dir + '/auto')|replace('/./', '/') -%}
 {{ target_dir }}:
   file.directory:
     - user: root
@@ -23,15 +40,17 @@
     - group: root
     - mode: 644
     - template: jinja
+    - defaults:
+        customers_top: {{ customers_top }}
 
 # generate password for customers
 {% set password_db = target_dir + '/managed_password.yaml' -%}
-{% set user_db = pillar_dir + '/customers.sls' -%}
+{% set user_db = pillar_dir + '/' + customers_dir + '/customers.sls' -%}
 {% set formuladir = '/srv/salt/formulas/customers-formula/customers' %}
 {% set password_gen = formuladir ~ '/customers_passwords.py' %}
 check_passwords:
   cmd.run:
-    - name: {{ password_gen }} {{ user_db }} {{ password_db }} && touch {{ password_db }}
+    - name: {{ password_gen }} {{ customers_top }} {{ user_db }} {{ password_db }} && touch {{ password_db }}
     - cwd: {{ formuladir }}
     # run only if: the script is newer or customers.sls is newer, but may not generate any new password
     - onlyif: test {{ password_gen }} -nt {{ password_db }} -o {{ user_db }} -nt {{ password_db }}
@@ -55,6 +74,7 @@ generate_customers_passwords:
     - template: jinja
     - defaults:
        password_db: {{ password_db }}
+       customers_top: {{ customers_top }}
 
 # produce managed domains, if customer is enabled, and has DNS service
 {{ target_dir }}/domains.sls:
@@ -64,6 +84,8 @@ generate_customers_passwords:
     - group: root
     - mode: 644
     - template: jinja
+    - defaults:
+       customers_top: {{ customers_top }}
 
 # produce webconfig
 {{ target_dir }}/webconfig.sls:
@@ -73,6 +95,8 @@ generate_customers_passwords:
     - group: root
     - mode: 644
     - template: jinja
+    - defaults:
+       customers_top: {{ customers_top }}
 
 # produce shellusers
 {{ target_dir }}/shell_users.sls:
@@ -84,3 +108,4 @@ generate_customers_passwords:
     - template: jinja
     - defaults:
        password_db: {{ password_db }}
+       customers_top: {{ customers_top }}

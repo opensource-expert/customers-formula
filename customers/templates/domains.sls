@@ -6,7 +6,7 @@ customers:
   # Managed domains for customers
   domains:
 {#- produce managed domains, if customer is enabled, and has DNS the service #}
-{%- for name, client in salt['pillar.get']('wsf:customers', {}).items() -%}
+{%- for name, client in salt['pillar.get']('%s:customers'|format(customers_top), {}).items() -%}
 {%-   if 'dns' in client['services'] %}
 {%-     set customer_deleted = client.get('deleted') or client.get('delete') %}
 {%-     set customer_was_present = salt['pillar.get']('customers:domains:%s'|format(client.domain_name)) %}

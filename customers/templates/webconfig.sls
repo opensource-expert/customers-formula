@@ -6,13 +6,13 @@
 # pillar for apache formula for "sites:"
 apache:
   sites:
-{%- for user, client in salt['pillar.get']('wsf:customers', {}).items() %}
+{%- for user, client in salt['pillar.get']('%s:customers'|format(customers_top), {}).items() %}
 {%-   if 'webhost' in client['services'] %}
         {%- set customer_deleted = client.get('deleted') or client.get('delete') %}
         {%- set customer_was_present = salt['pillar.get']('apache:sites:%s'|format(client.domain_name)) %}
 {%-     if not customer_deleted %}
 {#-     webmaster is computed globally but can be set by customer also #}
-{%-     set webmaster         = salt['pillar.get']('wsf:global:webmaster', 'nowebmaster@localhost') %}
+{%-     set webmaster         = salt['pillar.get']('%s:global:webmaster'|format(customers_top), 'no@webmaster') %}
 {%-     set webmaster         = client.get('webmaster', webmaster) %}
 {%-     set userHome_dir      = '/home/' ~ user %}
 {%-     set ApacheHome_dir    = '/home/' ~ user ~ '/vhost' %}

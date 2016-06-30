@@ -7,7 +7,7 @@
 {{ '{%' }} import_yaml "{{ password_db }}" as pass with context {{ '%}' }}
 # Managed shell users for customers
 users:
-{%- for name, client in salt['pillar.get']('wsf:customers', {}).items() %}
+{%- for name, client in salt['pillar.get']('%s:customers'|format(customers_top), {}).items() %}
 {%-   if 'webhost' in client['services'] %}
         {%- set customer_deleted = client.get('deleted') or client.get('delete') %}
         {%- set customer_was_present = salt['pillar.get']('users:%s'|format(name)) %}

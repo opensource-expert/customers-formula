@@ -2,10 +2,11 @@
 # top level pillar customer abstract config.
 # Status: functionnal
 #
-# See customers.d/ for details on each customer
-# See also: base/customers/init.sls for state.
-#
-#
+
+# 'wsf', is customers_top which have to be defined for your saltmaster, could be here
+# or in orchestration
+customers_top: wsf
+
 wsf:
   global:
     # for web server ServerAdmin
@@ -25,7 +26,7 @@ wsf:
       services:
         - webhost
         - dns
-        - mysql
+        - db
         - sftp
     # client2 as more default values
     client2:

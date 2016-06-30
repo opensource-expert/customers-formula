@@ -5,7 +5,7 @@
 # python password generator
 # Depend: pwqgen
 # Usage:
-#  ./customers_passwords.py pillarpath/to/customers.sls pillarpath/user_passwords.yaml
+#  ./customers_passwords.py customers_top pillarpath/to/customers.sls pillarpath/user_passwords.yaml
 #
 # Output: Int, the number of created passwords in pillarpath/user_passwords.sls
 #
@@ -13,7 +13,7 @@
 #   /!\ input files are PURE yaml file format
 #
 #  customers.sls:
-#    wsf:
+#    customers_top:
 #      customers:
 #        client1: <-- key used for password match as username
 #          […]
@@ -117,7 +117,7 @@ def update_missing_fields(passDB, force_hash=False):
                 n += 1
     return n
 
-def main(user_db, password_db):
+def main(customers_top, user_db, password_db):
     userDB = read_yaml(user_db)
 
     # we can handle non existant password file
@@ -127,7 +127,7 @@ def main(user_db, password_db):
         passDB = {}
 
     # hardcoded path to access data for customers
-    mysql_users = userDB['wsf']['customers'].keys()
+    mysql_users = userDB[customers_top]['customers'].keys()
 
     # keys names matching username are top level
     if passDB:
@@ -157,6 +157,7 @@ def main(user_db, password_db):
 
 
 if __name__ == '__main__':
-    user_db = sys.argv[1]
-    password_db = sys.argv[2]
-    print(main(user_db, password_db))
+    customers_top = sys.argv[1]
+    user_db = sys.argv[2]
+    password_db = sys.argv[3]
+    print(main(customers_top, user_db, password_db))

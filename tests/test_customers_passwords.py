@@ -119,13 +119,14 @@ def test_update_missing_fields():
         assert old_pass[k]['mysql'] == copy_pass[k]['mysql']
 
 def test_main():
+    customers_top = 'wsf'
     user_db = '../pillar.example'
     password_db = 'pass.yaml'
 
     assert os.path.isfile(user_db)
     assert not os.path.isfile(password_db)
 
-    main(user_db, password_db)
+    main(customers_top, user_db, password_db)
     assert os.path.isfile(password_db)
 
     users = read_yaml(user_db)
