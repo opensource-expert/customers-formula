@@ -52,7 +52,7 @@ wsf:
         - webhost
         - dns
         - db
-        # sftp access only is managed by a custom state, but it generate user-formula pillar
+        # sftp access only is managed by a custom state, but it generates users-formula pillar
         - sftp
     # client2 with some default values
     client2:
