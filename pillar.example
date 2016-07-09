@@ -14,6 +14,8 @@ wsf:
     dbserver: database.domain.com
     # used to compute database permission from the webserver
     webserver: web.domain.com
+    # you can set sub-dir in pillar, for generating for more than one customers_top
+    customers_dir: some_dir_at_in_pillar_folder
   customers:
     # list elements will be used for naming users (shell, db)
     client1:
@@ -28,6 +30,13 @@ wsf:
         - dns
         - db
         - sftp
+        - email
+      email_accounts:
+        # domain_name will be appended
+        - fred
+        - bob
+        - spamtrap
+        - alice
     # client2 as more default values
     client2:
       domain_name: more-domain.com

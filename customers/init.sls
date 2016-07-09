@@ -109,3 +109,14 @@ generate_customers_passwords:
     - defaults:
        password_db: {{ password_db }}
        customers_top: {{ customers_top }}
+
+# produce email domains and mail account
+{{ target_dir }}/email_account.sls:
+  file.managed:
+    - source: salt://customers/templates/email_account.sls
+    - user: root
+    - group: root
+    - mode: 644
+    - template: jinja
+    - defaults:
+       customers_top: {{ customers_top }}
