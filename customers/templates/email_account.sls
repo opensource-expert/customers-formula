@@ -18,12 +18,12 @@ customers:
 {%-       endif %}
         customer_name: {{ name }}
 {%-     endif %}
-  accounts:
-    {{ name }}:
-    {%- for email in customers[name].get('email_accounts', []) %}
-        {%- set dom = '@' ~ client.domain_name %}
-        {#- the replace allow to write name or name@ or name@fuldom #}
-        - {{ (email ~ dom)|replace('@@', '@')|replace(dom * 2, dom) }}
-    {%- endfor %}
+    accounts:
+      {{ name }}:
+      {%- for email in customers[name].get('email_accounts', []) %}
+          {%- set dom = '@' ~ client.domain_name %}
+          {#- the replace allow to write name or name@ or name@fuldom #}
+          - {{ (email ~ dom)|replace('@@', '@')|replace(dom * 2, dom) }}
+      {%- endfor %}
 {%-   endif %}
 {%- endfor -%}
