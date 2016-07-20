@@ -41,15 +41,17 @@ def test_random_pass():
 def test_create_all_pass():
     data = create_all_pass()
 
-    assert len(data) == 3
+    assert len(data) == 4
     for k, p in data.items():
         assert len(p) >= 8
 
     assert data['hash'] != data['shell']
     assert data['mysql'] != data['shell']
+    assert data['mysql'] != data['websmtp']
+    assert data['shell'] != data['websmtp']
 
     # OrderedDict
-    assert data.keys() == ['mysql', 'shell', 'hash' ]
+    assert data.keys() == ['mysql', 'shell', 'websmtp', 'hash' ]
 
 def test_write_password_db_yaml():
     fname = 'pass.yaml'
@@ -72,9 +74,33 @@ def test_write_password_db_yaml():
     os.remove(fname)
     assert not os.path.isfile(fname)
 
+def _check_old_yaml(old_file, old_field_count, also_keep = []):
+    """
+    also_keep: array of fields names to test for been kept
+    """
+
+    # with an old unordered passwords
+    # ensure old value are still here
+    old_pass = read_yaml(old_file)
+    copy_pass = copy.deepcopy(old_pass)
+
+    # should be 7 
+    count = len(old_pass.keys())
+    assert count > 0
+
+    # will return n of updated fields 
+    nb_fields = len(create_all_pass().keys())
+    n = update_missing_fields(copy_pass)
+    assert n == (count * (nb_fields - old_field_count))
+
+    for k in old_pass.keys():
+        for k0 in ['shell', 'mysql'] + also_keep:
+            assert old_pass[k][k0] == copy_pass[k][k0]
+
 def test_update_missing_fields():
     passDB = _create_passDB(5)
 
+    # idempotent nothing changes
     n = update_missing_fields(passDB)
     assert n == 0
 
@@ -105,18 +131,9 @@ def test_update_missing_fields():
     assert n == 5
     assert passDB['user5']['hash'] != old_hash
 
-    # with an old unordered passwords
-    # ensure old value are still here
-    old_pass = read_yaml('old_pass.yaml')
-    copy_pass = copy.deepcopy(old_pass)
+    _check_old_yaml('very_old_pass.yaml', 2)
+    _check_old_yaml('old_pass.yaml', 3)
 
-    count = len(old_pass.keys())
-    assert count > 0
-    n = update_missing_fields(copy_pass)
-    assert n == count
-    for k in old_pass.keys():
-        assert old_pass[k]['shell'] == copy_pass[k]['shell']
-        assert old_pass[k]['mysql'] == copy_pass[k]['mysql']
 
 def test_main():
     customers_top = 'wsf'
