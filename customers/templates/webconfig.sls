@@ -3,6 +3,9 @@
 # DON'T EDIT THIS FILE: salt managed file
 #
 #
+{# will import on the pillar side a generated passwords database -#}
+{{ '{%' }} import_yaml "{{ password_db }}" as pass with context {{ '%}' }}
+
 # pillar for apache formula for "sites:"
 apache:
   sites:
@@ -25,7 +28,10 @@ apache:
 {%-        if not client['enabled'] %}
       enabled: False
 {%         endif %}
+      {#- extra pillar value for other rules #}
       CustomerName: {{ user }}
+      HomeDir: {{ userHome_dir }}
+      MailPassword: {{ '"{{' }} pass['{{ user }}']['websmtp'] {{ '}}"' }}
 
       #template_file: salt://webserver/config/vhost.conf
       ServerName: {{ client.domain_name }}

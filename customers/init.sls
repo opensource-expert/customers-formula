@@ -97,6 +97,7 @@ generate_customers_passwords:
     - template: jinja
     - defaults:
        customers_top: {{ customers_top }}
+       password_db: {{ password_db }}
 
 # produce shellusers
 {{ target_dir }}/shell_users.sls:

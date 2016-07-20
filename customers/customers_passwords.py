@@ -2,15 +2,17 @@
 # -*- coding: utf-8 -*-
 # vim: set ft=python:
 #
-# python password generator
+# python password generator for customers
+#
 # Depend: pwqgen
+#
 # Usage:
 #  ./customers_passwords.py customers_top pillarpath/to/customers.sls pillarpath/user_passwords.yaml
 #
 # Output: Int, the number of created passwords in pillarpath/user_passwords.sls
 #
 # fileformat:
-#   /!\ input files are PURE yaml file format
+#   /!\ input files are PURE yaml file format, no jinja
 #
 #  customers.sls:
 #    customers_top:
@@ -24,12 +26,16 @@
 #    client1:
 #      mysql: bla
 #      shell: piou
+#      websmtp: somepass_for_controling_email_from_the_web
+#      hash: $1$17391272$rgWtYpRIDVUrT202c89Fp1
 #    client2:
 #      mysql: somepassword
 #      shell: shelllpassword
-#    client3:
-#      mysql: Them3symbol-Sit
-#      shell: flint*forbid_false
+#      websmtp: my_web_pass_for_mail
+#      hash: $1$17391272$rgWtYpRIDVUrT202c89Fp1
+#    # one entry per customers name…
+
+# unittest: See ../tests/test_customers_passwords.py
 
 from __future__ import absolute_import
 import subprocess
@@ -66,6 +72,7 @@ def create_all_pass():
     new_pass = OrderedDict()
     new_pass['mysql'] = random_pass()
     new_pass['shell'] = shell_pass
+    new_pass['websmtp'] = random_pass()
     new_pass['hash'] = unix_pass(shell_pass)
     return new_pass
 
@@ -94,7 +101,7 @@ def update_missing_fields(passDB, force_hash=False):
     return number of updated records
     """
 
-    # fetch fields
+    # fetch fields generated pass are ignored
     fields = create_all_pass().keys()
     n = 0
 
