@@ -17,7 +17,8 @@ apache:
 {#-     webmaster is computed globally but can be set by customer also #}
 {%-     set webmaster         = salt['pillar.get']('%s:global:webmaster'|format(customers_top), 'no@webmaster') %}
 {%-     set webmaster         = client.get('webmaster', webmaster) %}
-{%-     set userHome_dir      = '/home/' ~ user %}
+        {#- userHome_dir is the same a ApacheHome_dir See template/shell_users.sls  #}
+{%-     set userHome_dir      = '/home/' ~ user ~ '/vhost' %}
 {%-     set ApacheHome_dir    = '/home/' ~ user ~ '/vhost' %}
 {%-     set DocumentRoot_dir  = '/home/' ~ user ~ '/vhost/www' %}
 {%-     set Log_dir           = '/home/' ~ user ~ '/logs' %}
