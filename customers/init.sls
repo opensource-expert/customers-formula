@@ -32,6 +32,13 @@ Fail - no customers found:
     - group: root
     - dir_mode: 755
 
+# check input pillar
+check_customers_pillar:
+  # it use a custom state in _state/
+  customers.validate_pillar:
+    - customers_top: {{ customers_top }}
+    - failhard: True
+
 # produce managed databases for customers in pillar/customers
 {{ target_dir }}/mysql_db.sls:
   file.managed:
