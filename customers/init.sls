@@ -121,10 +121,10 @@ generate_customers_passwords:
 # produce email domains and mail account
 {{ target_dir }}/email_account.sls:
   file.managed:
-    - source: salt://customers/templates/email_account.sls
+    - source: salt://customers/templates/email_account.py
     - user: root
     - group: root
     - mode: 644
-    - template: jinja
+    - template: py
     - defaults:
        customers_top: {{ customers_top }}
