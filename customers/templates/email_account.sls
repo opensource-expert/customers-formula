@@ -6,6 +6,7 @@ customers:
   email:
     domain:
       {%- set customers = salt['pillar.get']('%s:customers'|format(customers_top), {}) %}
+      {%- set account = {}  %}
 {#- produce managed domains, if customer is enabled, and has email the service #}
 {%- for name, client in customers.items() -%}
 {%-   if 'email' in client['services'] %}
@@ -18,12 +19,22 @@ customers:
 {%-       endif %}
         customer_name: {{ name }}
 {%-     endif %}
-    accounts:
-      {{ name }}:
-      {%- for email in customers[name].get('email_accounts', []) %}
+{# email account collector #}
+        {%- do account.update({name : []})  %}
+        {%- for email in customers[name].get('email_accounts', []) %}
           {%- set dom = '@' ~ client.domain_name %}
           {#- the replace allow to write name or name@ or name@fuldom #}
-          - {{ (email ~ dom)|replace('@@', '@')|replace(dom * 2, dom) }}
-      {%- endfor %}
+          {%- set email = (email ~ dom)|replace('@@', '@')|replace(dom * 2, dom) %}
+          {%- do account[name].append(email) %}
+        {%- endfor %}
 {%-   endif %}
+{%- endfor -%}
+    accounts:
+{%- for name, emails in account.items() %}
+  {% if emails is iterable %}
+    {{ name }}:
+    {%- for email in emails%}
+      - {{ email }}
+    {%- endfor %}
+  {% endif %}
 {%- endfor -%}
