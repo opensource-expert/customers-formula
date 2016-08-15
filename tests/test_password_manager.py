@@ -67,8 +67,13 @@ def test_email_pass_get():
     del db[c][address]
     assert not db[c].has_key(address)
     assert password_manager.email_pass_get(c, address, db, ret)
+    passwd = ret['ret']
     assert len(db[c][address]) > 8
+    assert db[c][address] == passwd
 
+    # don't overwrit password
+    assert password_manager.email_pass_get(c, address, db, ret)
+    assert db[c][address] == passwd
 
 def test_main(capsys):
     password_file = 'old_pass.yaml'
