@@ -46,7 +46,7 @@ def email_pass_present(customer, email, passDB):
         raise ValueError("not found: %s:%s" % (customer, email))
 
     if not has_email:
-        raise ValueError("no password found: %s:%s" % (customer, email))
+        raise ValueError("no entry found: %s:%s" % (customer, email))
     else:
         email_pass = passDB.get(customer).get(email)
         if email_pass:
@@ -58,6 +58,8 @@ def email_pass_present(customer, email, passDB):
 # call:
 #   ret = {}
 #   email_pass_get(customer, email, db, ret)
+# password creation can be triggered of unexistant password with
+# {'create' :  True } as ret init value
 def email_pass_get(customer, email, passDB, ret):
     try:
         r = email_pass_present(customer, email, passDB)
