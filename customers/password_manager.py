@@ -34,6 +34,7 @@
 # unittest: See ../tests/test_password_manager.py
 
 from __future__ import absolute_import
+import sys
 
 # import other tool
 import customers_passwords
@@ -53,10 +54,21 @@ def email_pass_present(customer, email, passDB):
         else:
             return False
 
-def email_pass_get(customer, email, passDB):
-    r = email_pass_present(customer, email, passDB)
+# get value back in ret['ret'],
+# call:
+#   ret = {}
+#   email_pass_get(customer, email, db, ret)
+def email_pass_get(customer, email, passDB, ret):
+    try:
+        r = email_pass_present(customer, email, passDB)
+    except ValueError:
+        if ret.has_key('create') and ret['create']:
+            email_pass_set(customer, email, passDB)
+            r = True
+        else:
+            raise
     if r:
-        print(passDB[customer][email])
+        ret['ret'] = passDB[customer][email]
         return True
     else:
         return False
@@ -90,13 +102,22 @@ def main(action, customer, email, password_file):
             customers_passwords.write_password_db_yaml(password_file, passDB)
         return True
     elif action == 'read':
-        return email_pass_get(customer, email, passDB)
+        ret = {}
+        r = email_pass_get(customer, email, passDB, ret)
+        if r:
+            print(ret['ret'])
+        return r
 
 if __name__ == '__main__':
+    actions = ['add', 'present', 'read']
+
     action = sys.argv[1]
+    if action not in actions:
+        raise ValueError('invalide action not in: %s' % ', '.join(actions))
     customer = sys.argv[2]
     email = sys.argv[3]
     password_file = sys.argv[4]
+
 
     r = main(action, customer, email, password_file)
     if r:
