@@ -20,12 +20,13 @@ def _read_yaml(password_db = 'old_pass.yaml'):
 def test_email_pass_present():
     db = _read_yaml()
 
-    address = 'test@domain.com'
     c = 'client8'
+    address = 'test@domain.com'
     with pytest.raises(ValueError):
         assert not password_manager.email_pass_present(c, address, db)
 
     db[c][address] = ''
+    assert db[c].has_key(address)
     assert not password_manager.email_pass_present(c, address, db)
 
     db[c][address] = 'some'
@@ -54,8 +55,20 @@ def test_email_pass_get():
     assert r
     assert ret['ret'] == 'some'
 
+    # raise with unexistant emil
     with pytest.raises(ValueError):
-        assert password_manager.email_pass_get('unexsitant', address, db, ret)
+        password_manager.email_pass_get(c, address+'rand', db, ret)
+
+    with pytest.raises(ValueError):
+        password_manager.email_pass_get('unexsitant', address, db, ret)
+
+    # test create True
+    ret = {'create' : True }
+    del db[c][address]
+    assert not db[c].has_key(address)
+    assert password_manager.email_pass_get(c, address, db, ret)
+    assert len(db[c][address]) > 8
+
 
 def test_main(capsys):
     password_file = 'old_pass.yaml'

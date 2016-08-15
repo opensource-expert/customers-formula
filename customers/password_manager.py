@@ -59,7 +59,14 @@ def email_pass_present(customer, email, passDB):
 #   ret = {}
 #   email_pass_get(customer, email, db, ret)
 def email_pass_get(customer, email, passDB, ret):
-    r = email_pass_present(customer, email, passDB)
+    try:
+        r = email_pass_present(customer, email, passDB)
+    except ValueError:
+        if ret.has_key('create') and ret['create']:
+            email_pass_set(customer, email, passDB)
+            r = True
+        else:
+            raise
     if r:
         ret['ret'] = passDB[customer][email]
         return True
