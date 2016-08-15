@@ -118,7 +118,9 @@ generate_customers_passwords:
        password_db: {{ password_db }}
        customers_top: {{ customers_top }}
 
-# produce email domains and mail account
+# produce email domains and mail account and passwords
+{% set formuladir = '/srv/salt/formulas/customers-formula/customers' %}
+{% set password_manager = formuladir ~ '/password_manager.py' %}
 {{ target_dir }}/email_account.sls:
   file.managed:
     - source: salt://customers/templates/email_account.py
@@ -128,3 +130,6 @@ generate_customers_passwords:
     - template: py
     - defaults:
        customers_top: {{ customers_top }}
+       customers_path: {{ formuladir }}
+       password_db: {{ password_db }}
+       create_pass: True
