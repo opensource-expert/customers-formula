@@ -43,21 +43,19 @@ def test_email_pass_set():
     with pytest.raises(ValueError):
         assert password_manager.email_pass_set('unexsitant', address, db)
 
-def test_email_pass_get(capsys):
+def test_email_pass_get():
     db = _read_yaml()
 
     address = 'test@domain.com'
     c = 'client8'
     db[c][address] = 'some'
-    r = password_manager.email_pass_get(c, address, db)
-    # output captured via fixture, See def (capsys):
-    # http://doc.pytest.org/en/latest/capture.html#accessing-captured-output-from-a-test-function
-    out, err = capsys.readouterr()
+    ret = {}
+    r = password_manager.email_pass_get(c, address, db, ret)
     assert r
-    assert out == 'some\n'
+    assert ret['ret'] == 'some'
 
     with pytest.raises(ValueError):
-        assert password_manager.email_pass_get('unexsitant', address, db)
+        assert password_manager.email_pass_get('unexsitant', address, db, ret)
 
 def test_main(capsys):
     password_file = 'old_pass.yaml'
@@ -89,6 +87,8 @@ def test_main(capsys):
 
     # read the generated pass
     password_manager.main('read', c, a, password_file_new)
+    # output captured via fixture, See def (capsys):
+    # http://doc.pytest.org/en/latest/capture.html#accessing-captured-output-from-a-test-function
     out, err = capsys.readouterr()
     assert out == new_pass
 
