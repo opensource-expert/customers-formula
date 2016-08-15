@@ -13,12 +13,13 @@ mysql:
 {#-     # delete or deleted key, disabled (enabled == False) will be removed by mysql-formula #}
         {%- set customer_deleted =  client.get('deleted') or client.get('delete') %}
 {%-     if not customer_deleted and client['enabled'] %}
+          {%- set db_name = client.get('override', {}).get('database', name) %}
     {{ name }}:
       password: {{ '"{{' }} pass['{{ name }}']['mysql'] {{ '}}"' }}
       hosts:
         - {{ webserver }}
       databases:
-        - database: {{ name }}
+        - database: {{ db_name }}
           grants: ['all privileges']
       # ==========================
       # customer formula Extension
