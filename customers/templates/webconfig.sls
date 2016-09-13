@@ -34,7 +34,10 @@ apache:
       HomeDir: {{ userHome_dir }}
       MailPassword: {{ '"{{' }} pass['{{ user }}']['websmtp'] {{ '}}"' }}
 
-      #template_file: salt://webserver/config/vhost.conf
+        {%- set template_file = client.get('override', {}).get('template_file') %}
+        {%- if template_file %}
+      template_file: {{ template_file }}
+        {%- endif %}
       ServerName: {{ client.domain_name }}
       ServerAlias: www.{{ client.domain_name }}
       ServerAdmin: {{ webmaster }}
