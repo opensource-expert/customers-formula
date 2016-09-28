@@ -34,13 +34,20 @@ apache:
       HomeDir: {{ userHome_dir }}
       MailPassword: {{ '"{{' }} pass['{{ user }}']['websmtp'] {{ '}}"' }}
 
-        {%- set template_file = client.get('override', {}).get('template_file') %}
-        {%- if template_file %}
-      template_file: {{ template_file }}
-        {%- endif %}
+      # override if any
+        {%- for varname, data in client.get('override', {}).items() %}
+          {#- skip some  #}
+          {%- set skip = ['database'] %}
+          {%- if varname not in skip %}
+      {{ varname }}: {{ data }}
+          {%- endif %}
+        {%- endfor %}
       ServerName: {{ client.domain_name }}
       ServerAlias: www.{{ client.domain_name }}
       ServerAdmin: {{ webmaster }}
+      {%- if client.get('charset_php') %}
+      charset_php: {{ client.get('charset_php') }}
+      {%- endif %}
 
       LogLevel: warn
       {#- LogDir is a shorcut for webserver/create_dir.sls #}
