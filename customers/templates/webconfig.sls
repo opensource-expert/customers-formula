@@ -63,7 +63,7 @@ apache:
           Order: allow,deny
           Allow: from all
           Require: all granted
-          AllowOverride: None
+          AllowOverride: All
 
       Formula_Append: |
         <IfModule mod_fastcgi.c>
