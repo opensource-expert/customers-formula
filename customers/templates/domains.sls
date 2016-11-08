@@ -10,13 +10,16 @@ customers:
 {%-   if 'dns' in client['services'] %}
 {%-     set customer_deleted = client.get('deleted') or client.get('delete') %}
 {%-     set customer_was_present = salt['pillar.get']('customers:domains:%s'|format(client.domain_name)) %}
+{%-     set disable = not client['enabled'] %}
 {%-     if not customer_deleted or customer_was_present %}
-{%-       if client['enabled'] %}
-    {{ client.domain_name -}}: {}
-{%-       else %}
     {{ client.domain_name -}}:
-      disable: True
-{%-       endif %}
+      disable: {{ disable }}
+      {%- if client.get('override', {}).get('mailserver') %}
+      mailserver: {{ client['override']['mailserver'] }}
+      {%- endif %}
+      {%- if client.get('override', {}).get('interface') %}
+      web_ip: {{ client['override']['interface'] }}
+      {%- endif %}
 {%-     endif %}
 {%-   endif %}
 {%- endfor -%}
