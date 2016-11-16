@@ -2,6 +2,12 @@
 #
 # DON'T EDIT THIS FILE: salt managed file
 #
+{% macro define_if(key, client, override_key) %}
+      {%- if client.get('override', {}).get(override_key) %}
+      {{ key }}: {{ client['override'][override_key] }}
+      {%- endif -%}
+{% endmacro -%}
+
 customers:
   # Managed domains for customers
   domains:
@@ -14,12 +20,9 @@ customers:
 {%-     if not customer_deleted or customer_was_present %}
     {{ client.domain_name -}}:
       disable: {{ disable }}
-      {%- if client.get('override', {}).get('mailserver') %}
-      mailserver: {{ client['override']['mailserver'] }}
-      {%- endif %}
-      {%- if client.get('override', {}).get('interface') %}
-      web_ip: {{ client['override']['interface'] }}
-      {%- endif %}
+      {{- define_if('mailserver', client, 'mailserver') }}
+      {{- define_if('web_ip', client, 'interface') }}
+      {{- define_if('ns2', client, 'ns2') }}
 {%-     endif %}
 {%-   endif %}
 {%- endfor -%}
